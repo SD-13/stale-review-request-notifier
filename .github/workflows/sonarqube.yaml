@@ -1,0 +1,29 @@
+name: AccuKnox Scan Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - AK*
+  pull_request:
+    branches:
+      - main
+      - AK*
+
+jobs:
+  accuknox-cicd:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+   
+      - name: Run AccuKnox CSPM Scan
+        uses: 'accuknox/container-scan-action@v0.0.1'
+        with:
+          token: ${{ secrets.TOKEN }}
+          tenant_id: ${{ secrets.TENANT_ID }}
+          # repository_name: "udit-uniyal/accuknox-container-scan-example"
+          repository_name: ${{ github.repository }}
+          endpoint: cspm.demo.accuknox.com
+          # severity: "HIGH"
+          # exit_code: "1"
