@@ -12,7 +12,7 @@ coverage.xml
 .vscode/*
 .nyc_output/*
 env/
-venv/
+.venv/
 *.db
 .DS_Store
 .idea
