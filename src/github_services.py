@@ -358,7 +358,7 @@ def _delete_discussion(discussion_id: str) -> None:
             deleteDiscussion(input: {id: $discussion_id}) {
                 clientMutationId,
             		discussion {
-                  title
+                        title
                 }
             }
         }
@@ -375,6 +375,8 @@ def _delete_discussion(discussion_id: str) -> None:
         timeout=TIMEOUT_SECS
     )
     response.raise_for_status()
+    print()
+    print(response.json)
 
 @check_token
 def delete_discussions(
@@ -387,6 +389,7 @@ def delete_discussions(
     discussion_ids = _get_discussion_ids(
         org_name, repo_name, discussion_category)
 
+    print(discussion_ids)
     for discussion_id in discussion_ids:
         _delete_discussion(discussion_id)
 
