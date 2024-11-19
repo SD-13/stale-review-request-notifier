@@ -123,8 +123,7 @@ def main(args: Optional[List[str]]=None) -> None:
     for reviewer_name, pr_list in reviewer_to_assigned_prs.items():
         # discussion_title = f"Pending Reviews: @{reviewer_name}"
         discussion_title = "test-123"
-        PRs = '\n'.join(pr_list)
-        discussion_body = generate_message(PRs, TEMPLATE_PATH)
+        discussion_body = generate_message('\n'.join(str(pr) for pr in pr_list), TEMPLATE_PATH)
         github_services.create_discussion(
             org_name, repo_name, discussion_category, discussion_title, discussion_body)
 
