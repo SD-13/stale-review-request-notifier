@@ -58,12 +58,11 @@ PARSER.add_argument(
 TEMPLATE_PATH = '.github/PENDING_REVIEW_NOTIFICATION_TEMPLATE.md'
 
 
-def generate_message(username: str, pr_list: str, template_path: str=TEMPLATE_PATH) -> str:
+def generate_message(pr_list: str, template_path: str=TEMPLATE_PATH) -> str:
     """Generates message using the template provided in
     PENDING_REVIEW_NOTIFICATION_TEMPLATE.md.
 
     Args:
-        username: str. Reviewer username.
         pr_list: str. List of PRs not reviewed within the maximum waiting time.
         template_path: str. The template file path.
 
@@ -79,43 +78,9 @@ def generate_message(username: str, pr_list: str, template_path: str=TEMPLATE_PA
     with open(template_path, 'r', encoding='UTF-8') as file:
         message = file.read()
 
-    message = re.sub(r'\{\{ *username *\}\}', '@' + username, message)
     message = re.sub(r'\{\{ *pr_list *\}\}', pr_list, message)
 
     return message
-
-
-def send_notification(
-    username: str,
-    pull_requests: List[github_domain.PullRequest],
-    org_name: str,
-    repo_name: str,
-    discussion_category: str,
-    discussion_title: str
-) -> None:
-    """Sends notification on github-discussion.
-
-    Args:
-        username: str. GitHub username of the reviewer.
-        pull_requests: List. List of pending PRs.
-        org_name: str. The GitHub org name.
-        repo_name: str. The GitHub repo name.
-        discussion_category: str. Category name of the discussion.
-        discussion_title: str. Discussion title.
-    """
-    pr_list_messages: List[str] = []
-    for pull_request in pull_requests:
-        assignee = pull_request.get_assignee(username)
-        assert assignee is not None
-        pr_list_messages.append(
-            f'- [#{pull_request.pr_number}]({pull_request.url}) [Waiting for the '
-            f'last {assignee.get_waiting_time()}]')
-
-    message = generate_message(username, '\n'.join(pr_list_messages), TEMPLATE_PATH)
-
-    github_services.add_discussion_comments(
-        org_name, repo_name, discussion_category, discussion_title, message)
-
 
 def main(args: Optional[List[str]]=None) -> None:
     """The main function to execute the workflow.
@@ -148,12 +113,14 @@ def main(args: Optional[List[str]]=None) -> None:
     reviewer_to_assigned_prs = github_services.get_prs_assigned_to_reviewers(
         org_name, repo_name, max_wait_hours)
 
-    github_services.delete_discussion_comments(
-        org_name, repo_name, discussion_category, discussion_title)
+    github_services.delete_discussions(
+        org_name, repo_name, discussion_category)
 
-    for reviewer_name, prs in reviewer_to_assigned_prs.items():
-        send_notification(
-            reviewer_name, prs, org_name, repo_name, discussion_category, discussion_title)
+    for reviewer_name, pr_list in reviewer_to_assigned_prs.items():
+        discussion_title = f"Pending Reviews: @{reviewer_name}"
+        discussion_body = generate_message(pr_list)
+        github_services.create_discussion(
+            org_name, repo_name, discussion_category, discussion_title, discussion_body)
 
 
 if __name__ == '__main__':
