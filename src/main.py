@@ -93,9 +93,7 @@ def main(args: Optional[List[str]]=None) -> None:
     """
     parsed_args = PARSER.parse_args(args=args)
 
-    # org_name, repo_name = parsed_args.repo.split('/')
-    org_name = "oppia"
-    repo_name = "oppia"
+    org_name, repo_name = parsed_args.repo.split('/')
     discussion_category = parsed_args.category
     max_wait_hours = parsed_args.max_wait_hours
 
@@ -111,18 +109,14 @@ def main(args: Optional[List[str]]=None) -> None:
 
     github_services.init_service(parsed_args.token)
 
-
     reviewer_to_assigned_prs = github_services.get_prs_assigned_to_reviewers(
         org_name, repo_name, max_wait_hours)
 
-    org_name ="SD-13"
-    repo_name = "test-pending-review-notifier"
     github_services.delete_discussions(
         org_name, repo_name, discussion_category)
 
     for reviewer_name, pr_list in reviewer_to_assigned_prs.items():
-        discussion_title = f"Pending Reviews: {reviewer_name}"
-        # discussion_title = "test-123"
+        discussion_title = f"Pending Reviews: @{reviewer_name}"
         discussion_body = generate_message('\n'.join(str(pr) for pr in pr_list), TEMPLATE_PATH)
         github_services.create_discussion(
             org_name, repo_name, discussion_category, discussion_title, discussion_body)
