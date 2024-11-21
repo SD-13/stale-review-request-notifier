@@ -22,7 +22,7 @@ import logging
 import os
 import re
 
-from typing import List, Optional
+from typing import DefaultDict, List, Optional
 from src import github_domain
 from src import github_services
 
@@ -58,12 +58,13 @@ PARSER.add_argument(
 TEMPLATE_PATH = '.github/PENDING_REVIEW_NOTIFICATION_TEMPLATE.md'
 
 
-def generate_message(pr_list: str, template_path: str=TEMPLATE_PATH) -> str:
+def generate_message(username: str, pull_requests: List[github_domain.PullRequest], template_path: str=TEMPLATE_PATH) -> str:
     """Generates message using the template provided in
     PENDING_REVIEW_NOTIFICATION_TEMPLATE.md.
 
     Args:
-        pr_list: str. List of PRs not reviewed within the maximum waiting time.
+        username: str. Reviewer username.
+        pr_list: List[github_domain.PullRequest]. List of PullRequest not reviewed within the maximum waiting time.
         template_path: str. The template file path.
 
     Returns:
@@ -72,13 +73,23 @@ def generate_message(pr_list: str, template_path: str=TEMPLATE_PATH) -> str:
     Raises:
         Exception. Template file is missing in the given path.
     """
+    pr_list_messages: List[str] = []
+    for pull_request in pull_requests:
+        assignee = pull_request.get_assignee(username)
+        assert assignee is not None
+        pr_list_messages.append(
+            f'- [#{pull_request.pr_number}]({pull_request.url}) [Waiting for the '
+            f'last {assignee.get_waiting_time()}]')
+
+
     if not os.path.exists(template_path):
         raise builtins.BaseException(f'Please add a template file at: {template_path}')
     message = ''
     with open(template_path, 'r', encoding='UTF-8') as file:
         message = file.read()
 
-    message = re.sub(r'\{\{ *pr_list *\}\}', pr_list, message)
+    message = re.sub(r'\{\{ *username *\}\}', '@' + username, message)
+    message = re.sub(r'\{\{ *pr_list *\}\}', '\n'.join(pr_list_messages), message)
 
     return message
 
@@ -109,7 +120,7 @@ def main(args: Optional[List[str]]=None) -> None:
 
     github_services.init_service(parsed_args.token)
 
-    reviewer_to_assigned_prs = github_services.get_prs_assigned_to_reviewers(
+    reviewer_to_assigned_prs: DefaultDict[str, List[github_domain.PullRequest]] = github_services.get_prs_assigned_to_reviewers(
         org_name, repo_name, max_wait_hours)
 
     github_services.delete_discussions(
@@ -117,7 +128,7 @@ def main(args: Optional[List[str]]=None) -> None:
 
     for reviewer_name, pr_list in reviewer_to_assigned_prs.items():
         discussion_title = f"Pending Reviews: @{reviewer_name}"
-        discussion_body = generate_message('\n'.join(str(pr) for pr in pr_list), TEMPLATE_PATH)
+        discussion_body = generate_message(reviewer_name, pr_list, TEMPLATE_PATH)
         github_services.create_discussion(
             org_name, repo_name, discussion_category, discussion_title, discussion_body)
 

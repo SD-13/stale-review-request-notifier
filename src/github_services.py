@@ -231,7 +231,7 @@ def _get_repository_id(
     )
     data = response.json()
 
-    repository_id = (
+    repository_id: str = (
         data['data']['repository']['id'])
 
     if repository_id is None:
@@ -277,7 +277,7 @@ def _get_category_id(
     )
     data = response.json()
 
-    category_id = None
+    category_id: Optional[str] = None
     discussion_categories = (
         data['data']['repository']['discussionCategories']['nodes'])
 
@@ -290,6 +290,7 @@ def _get_category_id(
         raise builtins.BaseException(
             f'{discussion_category} category is missing in GitHub Discussion.')
 
+    assert category_id is not None
     return category_id
 
 
@@ -383,7 +384,7 @@ def delete_discussions(
     repo_name: str,
     discussion_category: str,
 ) -> None:
-    """Delete all existing discussions"""
+    """Delete all existing discussions in the given discussion category."""
 
     discussion_ids = _get_discussion_ids(
         org_name, repo_name, discussion_category)
@@ -398,8 +399,8 @@ def create_discussion(
     discussion_category: str,
     discussion_title: str,
     discussion_body: str
-):
-    """Create new discussion with given title and body."""
+) -> None:
+    """Create a new discussion with the given title and body in the given discussion category."""
 
     category_id = _get_category_id(org_name, repo_name, discussion_category)
     repo_id = _get_repository_id(org_name, repo_name)
