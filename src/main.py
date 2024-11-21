@@ -58,13 +58,18 @@ PARSER.add_argument(
 TEMPLATE_PATH = '.github/PENDING_REVIEW_NOTIFICATION_TEMPLATE.md'
 
 
-def generate_message(username: str, pull_requests: List[github_domain.PullRequest], template_path: str=TEMPLATE_PATH) -> str:
+def generate_message(
+    username: str,
+    pull_requests: List[github_domain.PullRequest],
+    template_path: str=TEMPLATE_PATH
+) -> str:
     """Generates message using the template provided in
     PENDING_REVIEW_NOTIFICATION_TEMPLATE.md.
 
     Args:
         username: str. Reviewer username.
-        pr_list: List[github_domain.PullRequest]. List of PullRequest not reviewed within the maximum waiting time.
+        pr_list: List[github_domain.PullRequest]. List of PullRequest objects not reviewed within
+            the maximum waiting time.
         template_path: str. The template file path.
 
     Returns:
@@ -120,8 +125,9 @@ def main(args: Optional[List[str]]=None) -> None:
 
     github_services.init_service(parsed_args.token)
 
-    reviewer_to_assigned_prs: DefaultDict[str, List[github_domain.PullRequest]] = github_services.get_prs_assigned_to_reviewers(
-        org_name, repo_name, max_wait_hours)
+    reviewer_to_assigned_prs: DefaultDict[str, List[github_domain.PullRequest]] = (
+        github_services.get_prs_assigned_to_reviewers(org_name, repo_name, max_wait_hours)
+    )
 
     github_services.delete_discussions(
         org_name, repo_name, discussion_category)

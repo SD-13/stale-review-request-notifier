@@ -21,7 +21,7 @@ import collections
 import datetime
 import logging
 
-from typing import Any, Callable, DefaultDict, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, DefaultDict, Dict, List, Optional, Union
 from dateutil import parser
 import requests
 from src import github_domain

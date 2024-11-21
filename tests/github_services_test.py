@@ -291,6 +291,7 @@ class TestGetPrsAssignedToReviewers(unittest.TestCase):
 
         self.assertEqual(mock_request.call_count, 6)
 
+
     def test_get_discussion_data(self) -> None:
         """Test _get_discussion_data."""
 
@@ -464,3 +465,11 @@ class TestGetPrsAssignedToReviewers(unittest.TestCase):
         self.assertTrue(mock_response_2.assert_called)
         self.assertTrue(mock_response_3.assert_called)
         self.assertEqual(mock_post.call_count, 3)
+
+
+_get_repository_id
+_get_category_id
+_get_discussion_ids
+_delete_discussion
+delete_discussions
+create_discussion
