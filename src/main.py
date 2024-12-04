@@ -80,11 +80,12 @@ def generate_message(
     """
     pr_list_messages: List[str] = []
     for pull_request in pull_requests:
-        assignee = pull_request.get_assignee(username)
-        assert assignee is not None
-        pr_list_messages.append(
-            f'- [#{pull_request.pr_number}]({pull_request.url}) [Waiting for the '
-            f'last {assignee.get_waiting_time()}]')
+        assignee: Optional[github_domain.Assignee] = pull_request.get_assignee(username)
+
+        if assignee is not None:
+            pr_list_messages.append(
+                f'- [#{pull_request.pr_number}]({pull_request.url}) [Waiting for the '
+                f'last {assignee.get_waiting_time()}]')
 
 
     if not os.path.exists(template_path):
@@ -114,7 +115,7 @@ def main(args: Optional[List[str]]=None) -> None:
     max_wait_hours = parsed_args.max_wait_hours
 
     # Raise error if any of the required arguments are not provided.
-    required_args = ['max_wait_hours', 'discussion_category', 'discussion_title']
+    required_args = ['max_wait_hours', 'discussion_category']
     for arg in required_args:
         if arg is None:
             raise builtins.BaseException(f'Please provide {arg} argument.')

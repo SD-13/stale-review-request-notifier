@@ -293,8 +293,6 @@ def _get_category_id(
     assert category_id is not None
     return category_id
 
-
-
 @check_token
 def _get_discussion_ids(
     org_name: str,
