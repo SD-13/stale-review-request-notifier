@@ -130,6 +130,8 @@ def main(args: Optional[List[str]]=None) -> None:
         github_services.get_prs_assigned_to_reviewers(org_name, repo_name, max_wait_hours)
     )
 
+    org_name = 'SD-13'
+    repo_name = 'test-pending-review-notifier'
     github_services.delete_discussions(
         org_name, repo_name, discussion_category)
 
