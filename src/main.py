@@ -110,7 +110,9 @@ def main(args: Optional[List[str]]=None) -> None:
     """
     parsed_args = PARSER.parse_args(args=args)
 
-    org_name, repo_name = parsed_args.repo.split('/')
+    # org_name, repo_name = parsed_args.repo.split('/')
+    org_name = "oppia"
+    repo_name = "oppia"
     discussion_category = parsed_args.category
     max_wait_hours = parsed_args.max_wait_hours
 
