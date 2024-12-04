@@ -94,7 +94,7 @@ def generate_message(
     with open(template_path, 'r', encoding='UTF-8') as file:
         message = file.read()
 
-    message = re.sub(r'\{\{ *username *\}\}', '@' + username, message)
+    message = re.sub(r'\{\{ *username *\}\}', + username, message)
     message = re.sub(r'\{\{ *pr_list *\}\}', '\n'.join(pr_list_messages), message)
 
     return message
