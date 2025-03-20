@@ -94,7 +94,7 @@ def generate_message(
     with open(template_path, 'r', encoding='UTF-8') as file:
         message = file.read()
 
-    message = re.sub(r'\{\{ *username *\}\}', '@' + username, message)
+    message = re.sub(r'\{\{ *username *\}\}', username, message)
     message = re.sub(r'\{\{ *pr_list *\}\}', '\n'.join(pr_list_messages), message)
 
     return message
@@ -110,7 +110,10 @@ def main(args: Optional[List[str]]=None) -> None:
     """
     parsed_args = PARSER.parse_args(args=args)
 
-    org_name, repo_name = parsed_args.repo.split('/')
+    # org_name, repo_name = parsed_args.repo.split('/')
+    org_name = "oppia"
+    repo_name = "oppia"
+
     discussion_category = parsed_args.category
     max_wait_hours = parsed_args.max_wait_hours
 
@@ -129,6 +132,9 @@ def main(args: Optional[List[str]]=None) -> None:
     reviewer_to_assigned_prs: DefaultDict[str, List[github_domain.PullRequest]] = (
         github_services.get_prs_assigned_to_reviewers(org_name, repo_name, max_wait_hours)
     )
+
+    org_name = 'SD-13'
+    repo_name = 'test-pending-review-notifier'
 
     github_services.delete_discussions(
         org_name, repo_name, discussion_category)
